@@ -16,7 +16,6 @@ router.use('/projects', authenticate)
 
 router.post('/register', (req, res) => {
     const userInfo = req.body
-    console.log(userInfo)
     const hash = bcrypt.hashSync(userInfo.password, 8)
     userInfo.password = hash
 
@@ -44,6 +43,13 @@ router.post('/login', (req, res) => {
         })
         .catch(({message}) => {
             res.status(500).json({message})
+        })
+})
+
+router.get('/users', (req, res) => {
+    db.find('user')
+        .then(user => {
+            res.status(200).json({user})
         })
 })
 
@@ -122,7 +128,7 @@ router.delete('/projects/:id', (req, res) => {
 router.post('/emails', (req, res) => {
     db.add("emails", req.body)
         .then(email => {
-            res.status(201).json({message: "Email successfully sent"})
+            res.status(201).json({message: "Email successfully sent", email})
         })
         .catch(({message}) => {
             res.status(500).json({message})
