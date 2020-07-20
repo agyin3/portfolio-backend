@@ -46,13 +46,6 @@ router.post('/login', (req, res) => {
         })
 })
 
-router.get('/users', (req, res) => {
-    db.find('user')
-        .then(user => {
-            res.status(200).json({user})
-        })
-})
-
 // Projects
 
 router.get('/projects', (req, res) => {
