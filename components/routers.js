@@ -14,21 +14,6 @@ router.use('/projects', authenticate)
 
 // Register & Login
 
-router.post('/register', (req, res) => {
-    const userInfo = req.body
-    const hash = bcrypt.hashSync(userInfo.password, 8)
-    userInfo.password = hash
-
-    db.add("user", userInfo)
-        .then(user => {
-            const token = generateToken(user)
-            res.status(201).json({token})
-        })
-        .catch(({message}) => {
-            res.status(500).json({message})
-        })
-})
-
 router.post('/login', (req, res) => {
     const { username, password } = req.body
 
@@ -58,6 +43,22 @@ router.get('/projects', (req, res) => {
         })
 })
 
+router.get('/projects/:id', (req, res) => {
+    const { id } = req.params
+
+    db.findBy('projeccts', { id }).first()
+        .then(project => {
+            if(!project) {
+                res.status(404).json({message: 'Invalid project ID'})
+            }else {
+                res.status(200).json({project})
+            }
+        })
+        .catch(err => {
+            res.status(500).json({message: 'There was an error', error: err})
+        })
+})
+
 router.post('/projects', (req, res) => {
     const project = req.body
 
@@ -73,7 +74,7 @@ router.post('/projects', (req, res) => {
 router.post('/projects/:id/images', multerUploads.single('image-raw'), cloudinaryConfig, (req, res) => {
     const { id } = req.params
     const file = dataUri(req)
-
+   
     uploader.upload(file.content, 
         { dpr: "auto", responsive: true, width: "auto", crop: "scale"}, 
         (error, result) => {
