@@ -10,8 +10,6 @@ const uploader = cloudinary.uploader
 const multerUploads = multer.multerUploads
 const dataUri = multer.dataUri
 
-router.use('/projects', authenticate)
-
 // Register & Login
 
 router.post('/login', (req, res) => {
@@ -43,7 +41,7 @@ router.get('/projects', (req, res) => {
         })
 })
 
-router.get('/projects/:id', (req, res) => {
+router.get('/projects/:id', authenticate, (req, res) => {
     const { id } = req.params
 
     db.findBy('projeccts', { id }).first()
@@ -59,7 +57,7 @@ router.get('/projects/:id', (req, res) => {
         })
 })
 
-router.post('/projects', (req, res) => {
+router.post('/projects', authenticate, (req, res) => {
     const project = req.body
 
     db.add("projects", project)
@@ -71,7 +69,7 @@ router.post('/projects', (req, res) => {
         })
 })
 
-router.post('/projects/:id/images', multerUploads.single('image-raw'), cloudinaryConfig, (req, res) => {
+router.post('/projects/:id/images', authenticate, multerUploads.single('image-raw'), cloudinaryConfig, (req, res) => {
     const { id } = req.params
     const file = dataUri(req)
    
@@ -88,7 +86,7 @@ router.post('/projects/:id/images', multerUploads.single('image-raw'), cloudinar
         })
 })
 
-router.put('/projects/:id', (req, res) => {
+router.put('/projects/:id', authenticate, (req, res) => {
     const { id } = req.params
 
     db.update("projects", id, req.body)
@@ -100,7 +98,7 @@ router.put('/projects/:id', (req, res) => {
         })
 })
 
-router.delete('/projects/:id', (req, res) => {
+router.delete('/projects/:id', authenticate, (req, res) => {
     const { id } = req.params
 
     db.remove("projects", id)
